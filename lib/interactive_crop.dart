@@ -31,7 +31,7 @@ class InteractiveCrop extends StatelessWidget {
           return Stack(
             children: [
               Crop(
-                initialRectBuilder: (viewportRect, imageRect) => cropZone,
+                initialRectBuilder: InitialRectBuilder.withArea(cropZone),
                 cornerDotBuilder: (_, __) => const SizedBox.shrink(),
                 interactive: true,
                 fixCropRect: true,
@@ -39,7 +39,16 @@ class InteractiveCrop extends StatelessWidget {
                 baseColor: Theme.of(context).scaffoldBackgroundColor,
                 controller: controller,
                 image: image,
-                onCropped: onCropped,
+                onCropped: (croppedImage) {
+                  switch (croppedImage) {
+                    case CropSuccess(croppedImage: var c):
+                      onCropped(c);
+                      break;
+                    case CropFailure(cause: var c, stackTrace: var s):
+                      print('Failed to crop image: $c');
+                      break;
+                  }
+                },
                 onStatusChanged: onStatusChanged,
               ),
               IgnorePointer(child: _RevealOverlay(roundedCropZone)),
